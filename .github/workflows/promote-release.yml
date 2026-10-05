@@ -1,0 +1,127 @@
+name: Promote application release
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
+
+concurrency:
+  group: application-release-channel
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    if: ${{ !github.event.release.prerelease && !github.event.release.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout channel repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download published release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          mkdir -p .release-assets
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir .release-assets
+
+      - name: Build and validate latest.json
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          tag = os.environ["TAG"].strip()
+          if not re.fullmatch(r"v\d+\.\d+\.\d+", tag):
+              raise SystemExit(f"Production release tag must be vX.Y.Z, got: {tag}")
+          version = tag[1:]
+          root = Path(".release-assets")
+          full = root / f"TrainingStandParser-{version}-win64.zip"
+          if not full.is_file():
+              raise SystemExit(f"Missing required full package: {full.name}")
+
+          def sha256(path: Path) -> str:
+              digest = hashlib.sha256()
+              with path.open("rb") as stream:
+                  for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                      digest.update(chunk)
+              return digest.hexdigest()
+
+          repo = os.environ["REPOSITORY"]
+          release_prefix = f"https://github.com/{repo}/releases/download/{tag}/"
+          patches = {}
+          pattern = re.compile(
+              rf"TrainingStandParser-(\d+\.\d+\.\d+)-to-{re.escape(version)}-patch\.zip"
+          )
+          for path in sorted(root.glob(f"TrainingStandParser-*-to-{version}-patch.zip")):
+              match = pattern.fullmatch(path.name)
+              if match is None:
+                  raise SystemExit(f"Unexpected patch filename: {path.name}")
+              base = match.group(1)
+              if path.stat().st_size >= full.stat().st_size:
+                  raise SystemExit(
+                      f"Patch {path.name} is not smaller than the full package; do not publish it."
+                  )
+              patches[base] = {
+                  "package_url": release_prefix + path.name,
+                  "sha256": sha256(path),
+              }
+
+          manifest = {
+              "schema_version": 1,
+              "version": version,
+              "mandatory": True,
+              "package_url": release_prefix + full.name,
+              "sha256": sha256(full),
+          }
+          if patches:
+              manifest["patches"] = patches
+
+          existing = Path("latest.json")
+          if existing.is_file():
+              old = json.loads(existing.read_text(encoding="utf-8"))
+              old_version = tuple(int(part) for part in str(old["version"]).split("."))
+              new_version = tuple(int(part) for part in version.split("."))
+              if new_version <= old_version:
+                  raise SystemExit(
+                      f"Refusing release-channel downgrade/equal publish: "
+                      f"{old['version']} -> {version}"
+                  )
+
+          serialized = json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+          Path("latest.json").write_text(serialized, encoding="utf-8")
+          history = Path("manifests")
+          history.mkdir(exist_ok=True)
+          (history / f"{tag}.json").write_text(serialized, encoding="utf-8")
+
+          print(f"Validated full package: {full.name} ({full.stat().st_size} bytes)")
+          for base, data in patches.items():
+              patch = root / Path(data["package_url"]).name
+              print(
+                  f"Validated patch {base} -> {version}: "
+                  f"{patch.name} ({patch.stat().st_size} bytes)"
+              )
+          print(serialized)
+          PY
+
+      - name: Commit promoted manifest
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          git config user.name "parser-release-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add latest.json manifests/
+          git commit -m "release: promote $TAG"
+          git push origin main
