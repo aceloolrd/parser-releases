@@ -20,3 +20,21 @@ Rules:
 
 Current initial remote publication uses the same selector content as the bundled configuration,
 with a higher `config_version`, so the real remote-delivery path can be acceptance-tested safely.
+
+
+## Application releases
+
+Application binaries are attached to GitHub Releases, not committed to the repository.
+
+For a production release `vX.Y.Z`, upload:
+
+- `TrainingStandParser-X.Y.Z-win64.zip` — mandatory full fallback package;
+- `TrainingStandParser-A.B.C-to-X.Y.Z-patch.zip` — optional incremental patches;
+- `TrainingStandParser-X.Y.Z-Setup.exe` — optional installer for first installation/reinstall.
+
+After a non-prerelease GitHub Release is published, the repository workflow validates the asset
+names and patch sizes, computes SHA-256 hashes, refuses channel downgrade, and commits
+`latest.json` automatically. Do not hand-edit `latest.json`.
+
+This ordering ensures clients never see a manifest that points at assets which have not yet been
+published.
