@@ -1,12 +1,6 @@
 {
   "mandatory": true,
   "package_url": "https://github.com/aceloolrd/parser-releases/releases/download/v0.1.2/TrainingStandParser-0.1.2-win64.zip",
-  "patches": {
-    "0.1.1": {
-      "package_url": "https://github.com/aceloolrd/parser-releases/releases/download/v0.1.2/TrainingStandParser-0.1.1-to-0.1.2-patch.zip",
-      "sha256": "c9df3a9cddf6bf8b60a3d5546b9a0fd2f138e93c6c0f8fcb9280a82f845d0738"
-    }
-  },
   "schema_version": 1,
   "sha256": "9038478339a3b82d63eb07a7bfa3840040c267ab3ca5664239d89af46b94338d",
   "version": "0.1.2"

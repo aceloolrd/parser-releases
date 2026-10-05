@@ -1,5 +1,5 @@
 {
-  "mandatory": true,
+  "mandatory": false,
   "package_url": "https://github.com/aceloolrd/parser-releases/releases/download/v0.1.2/TrainingStandParser-0.1.2-win64.zip",
   "patches": {
     "0.1.1": {
