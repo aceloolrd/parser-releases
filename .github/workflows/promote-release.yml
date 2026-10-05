@@ -106,6 +106,32 @@ jobs:
           history.mkdir(exist_ok=True)
           (history / f"{tag}.json").write_text(serialized, encoding="utf-8")
 
+          scenarios = Path("scenarios")
+          scenarios.mkdir(exist_ok=True)
+
+          full_only = dict(manifest)
+          full_only.pop("patches", None)
+          (scenarios / f"{version}-full-only.json").write_text(
+              json.dumps(full_only, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          optional = dict(manifest)
+          optional["mandatory"] = False
+          (scenarios / f"{version}-optional.json").write_text(
+              json.dumps(optional, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+
+          if patches:
+              broken_patch = json.loads(json.dumps(manifest))
+              for patch in broken_patch["patches"].values():
+                  patch["sha256"] = "0" * 64
+              (scenarios / f"{version}-patch-fallback.json").write_text(
+                  json.dumps(broken_patch, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+
           print(f"Validated full package: {full.name} ({full.stat().st_size} bytes)")
           for base, data in patches.items():
               patch = root / Path(data["package_url"]).name
@@ -122,6 +148,6 @@ jobs:
         run: |
           git config user.name "parser-release-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add latest.json manifests/
+          git add latest.json manifests/ scenarios/
           git commit -m "release: promote $TAG"
           git push origin main
