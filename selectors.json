@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "selectors": {
+    "prompt_input": [
+      "textarea[placeholder=\"Спросите о чём угодно\"]",
+      "[role=\"textbox\"]",
+      "textarea[aria-multiline=\"true\"]"
+    ],
+    "send_button": [
+      "button[aria-label=\"Отправить\"]",
+      "[data-testid=\"oknyx\"][aria-label=\"Отправить\"]",
+      "#oknyx-button[aria-label=\"Отправить\"]"
+    ],
+    "generation_stop": [
+      "[data-testid=\"oknyx\"][aria-label*=\"стоп\" i]",
+      "button[aria-label*=\"стоп\" i]",
+      "[data-testid=\"stop-generation\"]",
+      "button[aria-label*=\"Остановить\" i]",
+      "button:has-text(\"Остановить\")"
+    ],
+    "assistant_message": [
+      ".Message:has(.FuturisMarkdown)"
+    ],
+    "answer_block": [
+      ".FuturisMarkdown"
+    ],
+    "answer_remove": [
+      ".FuturisFootnoteGroup",
+      "[role=\"status\"]"
+    ],
+    "sources_button": [
+      "[data-testid=\"message-sources-button\"] button.FuturisSourcesButton",
+      "button.FuturisSourcesButton",
+      "button:has-text(\"Источники\")"
+    ],
+    "sources_popup": [
+      ".FuturisSourcesRollupPanel-Inner",
+      ".RolloutPanel-AsideInner:has(.FuturisSourcesRollupPanel-Title)",
+      ".FuturisSourcesRollupPanel:has(.FuturisSourcesRollupPanel-Title)",
+      "[data-testid=\"rollout-panel-opened\"]"
+    ],
+    "source_link": [
+      ".FuturisSourceDetails-GreenUrlLink[href^=\"http://\"], .FuturisSourceDetails-GreenUrlLink[href^=\"https://\"]",
+      ".FuturisSourceDetails a.Link[href^=\"http://\"], .FuturisSourceDetails a.Link[href^=\"https://\"]",
+      "a[href^=\"http://\"], a[href^=\"https://\"]"
+    ],
+    "captcha": [
+      "iframe[src*=\"captcha\" i]",
+      "iframe[title*=\"captcha\" i]",
+      "iframe[title*=\"провер\" i]"
+    ],
+    "login_control": [
+      "button:text-is(\"Войти\")",
+      "a:text-is(\"Войти\")"
+    ],
+    "degraded_model_banner": [
+      "[data-testid=\"notification-banner-unlogged\"]:has(.NotificationBanner-Title:text-is(\"Это ответ менее мощной модели\"))"
+    ],
+    "cookie_consent": [
+      "[role=\"alert\"][aria-labelledby=\"gdpr-popup-v3-main-title\"]",
+      ".gdpr-popup-v3-main[role=\"alert\"]",
+      "[role=\"alert\"]:has(#gdpr-popup-v3-main-title)",
+      "[role=\"alert\"]:has-text(\"Yandex uses cookies\")",
+      "text=\"Yandex uses cookies\""
+    ],
+    "cookie_accept": [
+      "#gdpr-popup-v3-button-mandatory",
+      ".gdpr-popup-v3-button_id_mandatory[role=\"button\"]",
+      "[role=\"alert\"] [role=\"button\"]:text-is(\"Allow essential cookies\")",
+      "#gdpr-popup-v3-button-all",
+      "[role=\"alert\"] [role=\"button\"]:text-is(\"Allow all\")",
+      "button:text-is(\"Allow essential cookies\")",
+      "button:text-is(\"Allow all\")"
+    ],
+    "sources_close": [
+      "button.FuturisSourcesRollupPanel-CloseButton",
+      ".FuturisSourcesRollupPanel-Header button.AliceButton",
+      ".FuturisSourcesRollupPanel-Header button",
+      "[data-testid=\"rollout-panel-opened\"] button[aria-label=\"Закрыть\"]",
+      "[data-testid=\"rollout-panel-opened\"] [role=\"button\"][aria-label=\"Закрыть\"]",
+      "[data-testid=\"rollout-panel-opened\"] button[aria-label=\"Close\"]"
+    ]
+  },
+  "text_markers": {
+    "captcha": [
+      "подтвердите, что вы не робот",
+      "я не робот",
+      "проверка безопасности",
+      "captcha",
+      "капча"
+    ],
+    "rate_limited": [
+      "слишком много запросов",
+      "превышен лимит запросов",
+      "повторите запрос позже",
+      "ограничение частоты",
+      "rate limit"
+    ],
+    "access_denied": [
+      "доступ ограничен",
+      "доступ запрещён",
+      "access denied",
+      "permission denied",
+      "ошибка 403"
+    ],
+    "auth_required": [
+      "войдите в аккаунт",
+      "требуется авторизация",
+      "авторизуйтесь",
+      "войти через sso"
+    ]
+  },
+  "config_version": 2
+}
