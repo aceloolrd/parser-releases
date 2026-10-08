@@ -1,5 +1,5 @@
 {
-  "mandatory": true,
+  "mandatory": false,
   "package_url": "https://github.com/aceloolrd/parser-releases/releases/download/v0.1.5/TrainingStandParser-0.1.5-win64.zip",
   "schema_version": 1,
   "sha256": "ef74ac9ff78f2792f9ba735d2c7f4456dca1a15bf25fa9b2f5f2d9309e251df1",
